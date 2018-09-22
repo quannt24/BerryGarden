@@ -2,21 +2,34 @@
 
 import time
 import datetime
+import RPi.GPIO as GPIO
+
+PUMP_CTL_PIN = 7
+
+schedule = [
+        ((0, 0), (0, 15)),
+        ((6, 0), (6, 15)),
+        ((9, 0), (9, 15)),
+        ((12, 0), (12, 15)),
+        ((15, 0), (15, 15)),
+        ((18, 0), (18, 15)),
+        ]
 
 def turnPumpOn():
     print("Turning pump on")
+    GPIO.output(PUMP_CTL_PIN, True)
 
 def turnPumpOff():
     print("Turning pump off")
+    GPIO.output(PUMP_CTL_PIN, False)
 
 def main():
     print("BerryGarden")
 
-    schedule = [
-            ((8, 0), (8, 15)),
-            ((14, 0), (14, 15)),
-            ((21, 0), (21, 15)),
-            ]
+    # Setup GPIO
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(PUMP_CTL_PIN, GPIO.OUT)
+    GPIO.output(PUMP_CTL_PIN, False)
 
     print()
     print("Schedule:")
@@ -56,4 +69,11 @@ def main():
 
 if __name__ == "__main__":
     # execute only if run as a script
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Keyboard interrupt")
+    except Exception as e:
+        print("Exception: " + str(e))
+    finally:
+        GPIO.cleanup()
